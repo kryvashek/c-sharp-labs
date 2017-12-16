@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 
 namespace lab08 {
     public class ConvMatrix {
@@ -49,19 +50,80 @@ namespace lab08 {
             return ( temp / div_n );
         }
 
+        public bool Apply( byte[][,] input, byte [][,] output, int threadsToRun = 0 ) {
+            if( 1 != input.Rank || 1 != output.Rank || 3 != input.Length || 3 != output.Length || 2 != input[ 0 ].Rank || 2 != output[ 0 ].Rank ) {
+                Console.WriteLine( "Wrong bitmap arrays passed to convolutional matrix." );
+                return false;
+            }
+
+            int limY = input[ 0 ].GetLength( 0 ), limX = input[ 0 ].GetLength( 1 );
+
+            if( limY != output[ 0 ].GetLength( 0 ) || limX != output[ 0 ].GetLength( 1 ) ) {
+                Console.WriteLine( "Bitmap arrays passed to convolutional matrix are not equal." );
+                return false;
+            }
+
+            if( 2 > threadsToRun ) {
+                int c, m, n;
+
+                for( c = 0; c < 3; c++ )
+                    for( m = 0; m < limY; m++ )
+                        for( n = 0; n < limX; n++ )
+                            output[ c ][ m, n ] = ( byte )Apply( ref input[ c ], m, n );
+            } else {
+                int step = limY / threadsToRun, rest = limY % threadsToRun, inWork = threadsToRun;
+
+                Console.WriteLine( "Using " + threadsToRun + " threads to process image" );
+
+                using( ManualResetEvent completed = new ManualResetEvent( false ) ) {
+                    for( int num = 0; num < threadsToRun; num++ )
+                        ThreadPool.QueueUserWorkItem( new WaitCallback( idx => {
+                            int i = ( int )idx;
+                            int start = i * step, finish = start + step, c, m, n;
+
+                            if( i < rest ) {
+                                start += i;
+                                finish += i + 1;
+                            } else {
+                                start += rest;
+                                finish += rest;
+                            }
+
+                            Console.WriteLine( "Thread " + i + " processing lines from " + start + " till " + finish );
+
+                            for( c = 0; c < 3; c++ )
+                                for( m = start; m < finish; m++ )
+                                    for( n = 0; n < limX; n++ )
+                                        output[ c ][ m, n ] = ( byte )Apply( ref input[ c ], m, n );
+
+                            if( 0 == Interlocked.Decrement( ref inWork ) )
+                                completed.Set();
+                        }), num );
+
+                    completed.WaitOne();
+                }
+            }
+
+            return true;
+        }
+
         public override string ToString() {
             return ToStr.ConvertMatrix( _val );
         }
 
         public static ConvMatrix ReadFromFile( string fileName ) {
             try {
-                string[] matrixText = File.ReadAllText( fileName ).Split( new char [] { ' ', '\r', '\n' } );
+                string[] matrixText = File.ReadAllText( fileName ).Split( new char [] { ' ', '\r', '\n', '\t', '\v' } );
                 int m = int.Parse( matrixText[ 0 ] ), n = int.Parse( matrixText[ 1 ] ), c = 2;
                 float[,] temp_mtx = new float [ m, n ];
 
                 for( m = 0; m < temp_mtx.GetLength( 0 ); m++ )
-                    for( n = 0; n < temp_mtx.GetLength( 1 ); n++ )
-                        temp_mtx[ m, n ] = float.Parse( matrixText[ c++ ] );
+                    for( n = 0; n < temp_mtx.GetLength( 1 ); n++ ) {
+                        while( 0 == matrixText[ c ].Length )
+                            c++;
+                        
+                        temp_mtx[ m, n ] = float.Parse( matrixText[ c++ ].Trim() );
+                    }
 
                 return new ConvMatrix( temp_mtx );
             } catch( Exception e ) {

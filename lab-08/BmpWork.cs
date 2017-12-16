@@ -57,7 +57,7 @@ namespace lab08 {
             return res;
         }
 
-        public unsafe static void SaveImageBytes( byte[][,] rgb, string fileName, string format ) {
+        public unsafe static bool SaveImageBytes( ref byte[][,] rgb, string fileName, string format ) {
             if( 3 != rgb.GetLength( 0 ) )
                 throw new ArrayTypeMismatchException( "Size of first dimension for passed array must be 3 (RGB components)." );
 
@@ -83,7 +83,7 @@ namespace lab08 {
                 res.UnlockBits( bd );
             }
 
-            SaveBitmap( ref res, fileName, Ext2Fmt( format ) );
+            return SaveBitmap( ref res, fileName, Ext2Fmt( format ) );
         }
 
         public static string Fmt2Ext( ImageFormat format ) {

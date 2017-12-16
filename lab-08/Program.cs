@@ -19,37 +19,45 @@ namespace lab08 {
     }
 
     class MainClass {
-        public static bool ReadArguments( ref string[] args, out string matrixFile, out string inFileName, out string outFormatExt, out string outFileName ) {
+        public static bool ReadArguments( ref string[] args, out string matrixFile, out string inFileName, out string outFormatExt, out string outFileName, out int threadsToRun ) {
             matrixFile = inFileName = outFormatExt = outFileName = "";
+            threadsToRun = 1;
 
-            if( 2 > args.Length || 4 < args.Length ) {
+            if( 2 > args.Length || 5 < args.Length ) {
                 Console.WriteLine( "Wrong parameters count. Usage:\n" +
-                    "filter <matrix-file> <input-file> [output-format] [output-file]\n" +
+                    "filter <matrix-file> <input-file> [output-format] [output-file] [threads-to-run]\n" +
                     "<matrix-file> specifies a file to read convolutional matrix from and has no default value\n" +
                     "<input-file> specifies a file to be filtered and has no default value\n" +
                     "[output-format] specifies a format by its extension and by default is 'bmp'\n" +
-                    "[output-file] specifies output file and by default is '<input-file>.<output-format-extension>'" );
+                    "[output-file] specifies output file and by default is '<input-file>.<output-format-extension>'\n" +
+                    "[threads-to-run] specifies count of threads to process image and by default is 1 (singlethreaded)" );
                 return false;
             }
 
             matrixFile = args[ 0 ];
             inFileName = args[ 1 ];
             outFormatExt = "bmp";
-            outFileName = inFileName + "-filtered." + outFormatExt;
 
             if( 2 < args.Length )
                 outFormatExt = args[ 2 ];
+            
+            outFileName = inFileName + "-filtered." + outFormatExt;
+            outFormatExt = outFormatExt.ToLower();
 
             if( 3 < args.Length )
-                outFormatExt = args[ 3 ];
+                outFileName = args[ 3 ];
+
+            if( 4 < args.Length )
+                threadsToRun = int.Parse( args[ 4 ].Trim() );
 
             return true;
         }
             
         public static int Main( string[] args ) {
             string matrixFile, inFileName, outFormatExt, outFileName;
+            int threadsToRun;
 
-            if( !ReadArguments( ref args, out matrixFile, out inFileName, out outFormatExt, out outFileName ) )
+            if( !ReadArguments( ref args, out matrixFile, out inFileName, out outFormatExt, out outFileName, out threadsToRun ) )
                 return -1;
 
             ConvMatrix mtx = ConvMatrix.ReadFromFile( matrixFile );
@@ -64,16 +72,19 @@ namespace lab08 {
                 "Output image file: " + outFileName + "\n" +
                 "Convolutional matrix to apply:\n" + mtx );
 
-            byte[][,] bitmap = BitmapsWork.BitmapToBytes( BitmapsWork.LoadBitmap( inFileName ) );
-            byte[][,] new_bitmap = BitmapsWork.CreateRgbBitmap( bitmap[ 0 ].GetLength( 0 ), bitmap[ 0 ].GetLength( 1 ) );
-            int c, m, n;
+            byte[][,] inBmp = BmpWork.LoadImageBytes( inFileName );
 
-            for( c = 0; c < 3; c++)
-                for( m = 0; m < bitmap[ c ].GetLength( 0 ); m++ )
-                    for( n = 0; n < bitmap[ c ].GetLength( 1 ); n++ )
-                        new_bitmap[ c ][ m, n ] = ( byte )mtx.Apply( ref bitmap[ c ], m, n );
+            if( null == inBmp )
+                return -3;
+            
+            byte[][,] outBmp = BmpWork.CreateImageBytes( inBmp[ 0 ].GetLength( 0 ), inBmp[ 0 ].GetLength( 1 ) );
 
-            BitmapsWork.BytesToBitmap( new_bitmap ).Save( outFileName, ImageFormat.Bmp );
+            if( !mtx.Apply( inBmp, outBmp, threadsToRun ) )
+                return -4;
+
+            if( !BmpWork.SaveImageBytes( ref outBmp, outFileName, outFormatExt ) )
+                return -5;
+            
             return 0;
         }
     }
