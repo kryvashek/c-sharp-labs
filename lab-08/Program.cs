@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 
 namespace lab08 {
-    class ToStr {
+    public class ToStr {
         public static string ConvertMatrix< T >( T[,] matrix ) {
             StringWriter sw = new StringWriter();
             int     i, j;
@@ -16,58 +16,6 @@ namespace lab08 {
             }
 
             return sw.ToString();
-        }
-    }
-
-    class ConvMatrix {
-        float[,]    _val = new float[,] { { 1 } };
-        float       _div = 1;
-        int         _halfY = 0, _halfX = 0;
-
-        public float this[ int i, int j ] {
-            get { return _val[ i, j ]; }
-            set { _val[ i, j ] = value; }
-        }
-
-        public float[,] Val {
-            get { return _val; }
-            set {
-                if( 2 != value.Rank || 0 == value.GetLength( 0 ) % 2 || 0 == value.GetLength( 1 ) % 2 )
-                    throw new ArrayTypeMismatchException( "Convolutional matrix should have 2 odd dimensions." );
-
-                _val = value;
-
-                _div = 0;
-                for( int i = 0; i < _val.GetLength( 0 ); i++ )
-                    for( int j = 0; j < _val.GetLength( 1 ); j++ )
-                        _div += _val[ i, j ];
-
-                _halfY = value.GetLength( 0 ) / 2;
-                _halfX = value.GetLength( 1 ) / 2;
-            }
-        }
-
-        public ConvMatrix( float[,] source ) {
-            Val = source;
-        }
-
-        public float Apply( ref byte[,] bitmap, int m, int n ) {
-            float   temp = 0;
-            float   div_n = _div;
-            int     i, j;
-
-            for( i = -_halfY; i <= _halfY; i++ )
-                for( j = -_halfX; j <= _halfX; j++ )
-                    if( m + i >= 0 && m + i < bitmap.GetLength( 0 ) && n + j >= 0 && n + j < bitmap.GetLength( 1 ) )
-                        temp += _val[ _halfY + i, _halfX + j ] * ( float )bitmap[ m + i, n + j ];
-                    else
-                        div_n -= _val[ _halfY + i, _halfX + j ];
-
-            return ( temp / div_n );
-        }
-
-        public override string ToString() {
-            return ToStr.ConvertMatrix( _val );
         }
     }
 
@@ -131,29 +79,63 @@ namespace lab08 {
 
             return res;
         }
-            
-        public static void Main( string[] args ) {
-            ConvMatrix mtx = new ConvMatrix( new float [,] { 
-                { 1, 0.1f, 0.1f, 0, 1 },
-                { 0, 0, 0.3f, 0, 0.1f },
-                { 0.1f, 0.3f, 0, 0.3f, 0.1f },
-                { 0.1f, 0, 0.3f, 0, 0 },
-                { 1, 0, 0.1f, 0.1f, 1 } } );
 
-            byte[][,] bitmap = BitmapToBytes( LoadBitmap( "/home/kryvashek/avatar_fullsize.jpg" ) );
+        public static bool ReadArguments( ref string[] args, out string matrixFile, out string inFileName, out string outFormatExt, out string outFileName ) {
+            matrixFile = inFileName = outFormatExt = outFileName = "";
+
+            if( 2 > args.Length || 4 < args.Length ) {
+                Console.WriteLine( "Wrong parameters count. Usage:\n" +
+                    "filter <matrix-file> <input-file> [output-format] [output-file]\n" +
+                    "<matrix-file> specifies a file to read convolutional matrix from and has no default value\n" +
+                    "<input-file> specifies a file to be filtered and has no default value\n" +
+                    "[output-format] specifies a format by its extension and by default is 'bmp'\n" +
+                    "[output-file] specifies output file and by default is '<input-file>.<output-format-extension>'" );
+                return false;
+            }
+
+            matrixFile = args[ 0 ];
+            inFileName = args[ 1 ];
+            outFormatExt = "bmp";
+            outFileName = inFileName + "-filtered." + outFormatExt;
+
+            if( 2 < args.Length )
+                outFormatExt = args[ 2 ];
+
+            if( 3 < args.Length )
+                outFormatExt = args[ 3 ];
+
+            return true;
+        }
+            
+        public static int Main( string[] args ) {
+            string matrixFile, inFileName, outFormatExt, outFileName;
+
+            if( !ReadArguments( ref args, out matrixFile, out inFileName, out outFormatExt, out outFileName ) )
+                return -1;
+
+            ConvMatrix mtx = ConvMatrix.ReadFromFile( matrixFile );
+
+            if( null == mtx )
+                return -2;
+
+            Console.WriteLine( 
+                "Convolutional matrix file: " + matrixFile + "\n" +
+                "Input image file: " + inFileName + "\n" +
+                "Output format: " + outFormatExt + "\n" +
+                "Output image file: " + outFileName + "\n" +
+                "Convolutional matrix to apply:\n" + mtx );
+
+            byte[][,] bitmap = BitmapToBytes( LoadBitmap( inFileName ) );
             byte[][,] new_bitmap = CreateRgbBitmap( bitmap[ 0 ].GetLength( 0 ), bitmap[ 0 ].GetLength( 1 ) );
             int c, m, n;
-
-            Console.WriteLine( mtx );
 
             for( c = 0; c < 3; c++)
                 for( m = 0; m < bitmap[ c ].GetLength( 0 ); m++ )
                     for( n = 0; n < bitmap[ c ].GetLength( 1 ); n++ )
                         new_bitmap[ c ][ m, n ] = ( byte )mtx.Apply( ref bitmap[ c ], m, n );
 
-            Bitmap result = BytesToBitmap( new_bitmap );
-
-            result.Save( "/home/kryvashek/avatar_fullsize_filtered.bmp", ImageFormat.Bmp );
+            BytesToBitmap( new_bitmap ).Save( outFileName, ImageFormat.Bmp );
+            return 0;
         }
     }
 }
