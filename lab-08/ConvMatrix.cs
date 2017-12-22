@@ -71,11 +71,11 @@ namespace lab08 {
                         for( n = 0; n < limX; n++ )
                             output[ c ][ m, n ] = ( byte )Apply( ref input[ c ], m, n );
             } else {
-                int step = limY / threadsToRun, rest = limY % threadsToRun, inWork = threadsToRun;
+                int step = limY / threadsToRun, rest = limY % threadsToRun;
 
                 Console.WriteLine( "Using " + threadsToRun + " threads to process image" );
 
-                using( ManualResetEvent completed = new ManualResetEvent( false ) ) {
+                using( CountdownEvent completed = new CountdownEvent( threadsToRun ) ) {
                     for( int num = 0; num < threadsToRun; num++ )
                         ThreadPool.QueueUserWorkItem( new WaitCallback( idx => {
                             int i = ( int )idx;
@@ -96,11 +96,10 @@ namespace lab08 {
                                     for( n = 0; n < limX; n++ )
                                         output[ c ][ m, n ] = ( byte )Apply( ref input[ c ], m, n );
 
-                            if( 0 == Interlocked.Decrement( ref inWork ) )
-                                completed.Set();
+                            completed.Signal();
                         }), num );
 
-                    completed.WaitOne();
+                    completed.Wait();
                 }
             }
 
