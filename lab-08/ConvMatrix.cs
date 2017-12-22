@@ -66,6 +66,8 @@ namespace lab08 {
             if( 2 > threadsToRun ) {
                 int c, m, n;
 
+                Console.WriteLine( "Using 1 thread to process image" );
+
                 for( c = 0; c < 3; c++ )
                     for( m = 0; m < limY; m++ )
                         for( n = 0; n < limX; n++ )

@@ -70,9 +70,10 @@ namespace lab08 {
                 "Input image file: " + inFileName + "\n" +
                 "Output format: " + outFormatExt + "\n" +
                 "Output image file: " + outFileName + "\n" +
+                "Threads to use:" + threadsToRun + "\n" +
                 "Convolutional matrix to apply:\n" + mtx );
 
-            byte[][,] inBmp = BmpWork.LoadImageBytes( inFileName );
+            byte[][,] inBmp = BmpWork.LoadImageBytes( inFileName, threadsToRun );
 
             if( null == inBmp )
                 return -3;
@@ -82,7 +83,7 @@ namespace lab08 {
             if( !mtx.Apply( inBmp, outBmp, threadsToRun ) )
                 return -4;
 
-            if( !BmpWork.SaveImageBytes( ref outBmp, outFileName, outFormatExt ) )
+            if( !BmpWork.SaveImageBytes( outBmp, outFileName, outFormatExt, threadsToRun ) )
                 return -5;
             
             return 0;
