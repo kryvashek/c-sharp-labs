@@ -18,17 +18,7 @@ namespace lab10 {
 
         public double Hdop { get { return _hdop; } }
 
-        public double Velocity {
-            get { return _velocity; }
-            set {
-                _velocity = value;
-
-                if( null == _entry.Element( _xmlns + "extensions" ) )
-                    _entry.Add( new XElement( _xmlns + "extensions" ) );
-
-                _entry.Element( _xmlns + "extensiosn" ).SetElementValue( _xmlns + "velocity", value );
-            }
-        }
+        public DateTime Moment { get { return _moment; } }
 
         public double Distance {
             get { return _distance; }
@@ -38,7 +28,26 @@ namespace lab10 {
                 if( null == _entry.Element( _xmlns + "extensions" ) )
                     _entry.Add( new XElement( _xmlns + "extensions" ) );
 
-                _entry.Element( _xmlns + "extensiosn" ).SetElementValue( _xmlns + "distance", value );
+                _entry.Element( _xmlns + "extensions" ).SetElementValue( _xmlns + "distance", value );
+            }
+        }
+
+        public double Velocity {
+            get { return _velocity; }
+            set {
+                _velocity = value;
+
+                if( null == _entry.Element( _xmlns + "extensions" ) )
+                    _entry.Add( new XElement( _xmlns + "extensions" ) );
+
+                _entry.Element( _xmlns + "extensions" ).SetElementValue( _xmlns + "velocity", value );
+            }
+        }
+
+        public GpxPoint Previous {
+            set {
+                Distance = CalcDistance( value, this );
+                Velocity = CalcVelocity( value, this, Distance );
             }
         }
 
@@ -105,6 +114,27 @@ namespace lab10 {
 
         override public string ToString() {
             return _latitude + ":" + _longitude + ":" + _altitude + " on " + _moment;
+        }
+
+        public static double CalcDistance( GpxPoint previous, GpxPoint current ) {
+            const double R = 6371e3; // Earth radius
+            double  rLat1 = previous.Latitude * Math.PI / 180.0,
+                    rLat2 = current.Latitude * Math.PI / 180.0,
+                    drLon = ( current.Longitude - previous.Longitude ) * Math.PI / 180.0;
+
+            double  a = Math.Sin( ( rLat2 - rLat1 ) / 2.0 ),
+                    b = Math.Sin( drLon / 2.0 );
+
+            double  hcls = a * a + Math.Cos( rLat1 ) * Math.Cos( rLat2 ) * b * b;
+
+            return R * 2 * Math.Atan2( Math.Sqrt( hcls ), Math.Sqrt( 1 - hcls ) );
+        }
+
+        public static double CalcVelocity( GpxPoint previous, GpxPoint current, double distance = -1.0 ) {
+            if( .0 > distance )
+                distance = CalcDistance( previous, current );
+            
+            return distance / ( current.Moment - previous.Moment ).TotalSeconds;
         }
     }
 }
