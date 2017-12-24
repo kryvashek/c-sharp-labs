@@ -20,6 +20,8 @@ namespace lab10 {
 
         public DateTime Moment { get { return _moment; } }
 
+        public XElement Entry { get { return _entry; } }
+
         public double Distance {
             get { return _distance; }
             set {

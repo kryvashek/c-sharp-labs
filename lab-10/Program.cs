@@ -4,59 +4,21 @@ using System.Xml;
 using System.Text;
 using System.Xml.Linq;
 using System.Collections.Generic;
-using Fclp;
 
 namespace lab10 {
     class MainClass {
-        private static XmlReader CreateReader( ref object source ) {
-            if( source is string )
-                return XmlReader.Create( source as string );
-            else if( source is TextReader )
-                return XmlReader.Create( source as TextReader );
-            else if( source is Stream )
-                return XmlReader.Create( source as Stream );
-            else if( source is XElement )
-                return ( source as XElement ).CreateReader();
-            else if( source is XmlReader )
-                return ( source as XmlReader );
-            else
-                return null;
-        }
-
-        private delegate bool CheckerMethod( string name );
-
-        private static CheckerMethod CreateChecker( ref object checkData ) {
-            if( checkData is string )
-                return ( checkData as string ).Equals;
-            else if( checkData is ICollection< string > )
-                return ( checkData as ICollection< string > ).Contains;
-            else
-                return null;
-        }
-
-        static IEnumerable< XmlReader > ReadEntries( object source, object checkData ) {
-            using( XmlReader reader = CreateReader( ref source ) ) {
-                CheckerMethod checker = CreateChecker( ref checkData );
-                reader.MoveToContent();
-
-                while( reader.Read() )
-                    if( XmlNodeType.Element == reader.NodeType && checker( reader.Name ) )
-                        yield return reader.ReadSubtree();
-            }
-        }
-
         static XElement ReadElement( XmlReader reader ) {
             reader.MoveToContent();
             return ( XElement.ReadFrom( reader ) as XElement );
         }
 
-        public struct Statistics {
+        struct Statistics {
             public double  
-            Distance,
-            Time,
-            MinSpeed,
-            MaxSpeed,
-            AvdSpeed;
+                Distance,
+                Time,
+                MinSpeed,
+                MaxSpeed,
+                AvdSpeed;
 
             public void Init() {
                 Distance = .0;
@@ -78,7 +40,7 @@ namespace lab10 {
             }
         }
 
-        public static void ProcessPoint( GpxPoint current, ref GpxPoint previous, ref Statistics stats ) {
+        private static void ProcessPoint( GpxPoint current, ref GpxPoint previous, ref Statistics stats ) {
             if( null != previous ) {
                 current.Previous = previous;
                 stats.Distance += current.Distance;
@@ -97,41 +59,60 @@ namespace lab10 {
         }
 
         public static int Main( string[] args ) {
-            double  hdopLimit = 8.0;
-            string  trackFile = "";
-            var     clp = new FluentCommandLineParser();
+            var parsedArgs = new ParsedArgs( args );
 
-            clp.Setup< double >( 'h', "hdop" )
-                .Callback( value => hdopLimit = value )
-                .SetDefault( 8.0 );
+            if( parsedArgs.Ready ) {
+                Console.WriteLine( parsedArgs );
 
-            clp.Setup< string >( 't', "track" )
-                .Callback( value => trackFile = value )
-                .Required();
-
-            if( clp.Parse( args ).HasErrors )
-                Console.WriteLine( "Wrong arguments passed to the application." );
-            else
-                using( XmlReader reader = XmlReader.Create( trackFile ) ) {
-                    GpxPoint    previous = null,
-                                current;
+                using( XmlReader reader = XmlReader.Create( parsedArgs.InTrackFile ) ) {
+                    XmlWriterSettings settings = new XmlWriterSettings();
                     Statistics stats = new Statistics();
 
+                    settings.Indent = true;
+                    settings.CloseOutput = true;
+                    settings.Encoding = UTF8Encoding.UTF8;
+                    settings.WriteEndDocumentOnClose = true;
                     stats.Init();
 
-                    foreach( XmlReader trkReader in ReadEntries( reader, "trk" ) )
-                        foreach( XmlReader trksegReader in ReadEntries( trkReader, "trkseg" ) )
-                            foreach( XmlReader trkptReader in ReadEntries( trksegReader, "trkpt" ) ) {
-                                current = new GpxPoint( ReadElement( trkptReader ), reader.NamespaceURI );
+                    using( XmlWriter writer = XmlWriter.Create( parsedArgs.OutTrackFile, settings ) ) {
+                        GpxPoint previous = null, current;
 
-                                if( current.Hdop > hdopLimit )
-                                    Console.WriteLine( current + ", hdop " + current.Hdop );
-                                else
-                                    ProcessPoint( current, ref previous, ref stats );
+                        writer.WriteStartDocument();
+
+                        foreach( XmlReader trkReader in ProcessXml.ReadEntries( reader, "trk" ) ) {
+                            XmlWriter trkWriter = XmlWriter.Create( writer );
+
+                            trkWriter.WriteStartElement( "trk" );
+
+                            foreach( XmlReader trksegReader in ProcessXml.ReadEntries( trkReader, "trkseg" ) ) {
+                                XmlWriter trksegWriter = XmlWriter.Create( trkWriter );
+
+                                trksegWriter.WriteStartElement( "trkseg" );
+
+                                foreach( XmlReader trkptReader in ProcessXml.ReadEntries( trksegReader, "trkpt" ) ) {
+                                    current = new GpxPoint( ReadElement( trkptReader ), reader.NamespaceURI );
+
+                                    if( current.Hdop > parsedArgs.HdopLimit )
+                                        Console.WriteLine( current + ", hdop " + current.Hdop );
+                                    else
+                                        ProcessPoint( current, ref previous, ref stats );
+
+                                    current.Entry.WriteTo( trksegWriter );
+                                }
+
+                                trksegWriter.WriteEndElement();
                             }
+                            
+                            trkWriter.WriteEndElement();
+                        }
+
+                        writer.Close();
+                    }
 
                     Console.WriteLine( stats );
                 }
+            } else
+                Console.WriteLine( "Wrong arguments passed to the application." );
 
             return 0;
         }
