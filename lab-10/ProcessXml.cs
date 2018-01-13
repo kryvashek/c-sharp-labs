@@ -5,6 +5,9 @@ using System.Xml.Linq;
 using System.Collections.Generic;
 
 namespace lab10 {
+    public delegate void ProcessMethod( XmlReader entry );
+    public delegate void ProcessMethodExtended( XmlReader entry , object extraData );
+
     public class ProcessXml {
         private static XmlReader CreateReader( ref object source ) {
             if( source is string )
@@ -32,22 +35,35 @@ namespace lab10 {
                 return null;
         }
 
+        public static XElement ReadElement( XmlReader reader ) {
+            reader.MoveToContent();
+            return ( XElement.ReadFrom( reader ) as XElement );
+        }
+
+        public static IEnumerable< XmlReader > ReadEntries( XmlReader source, object checkData ) {
+            CheckerMethod checker = CreateChecker( ref checkData );
+            source.MoveToContent();
+
+            while( source.Read() )
+                if( XmlNodeType.Element == source.NodeType && checker( source.LocalName ) )
+                    yield return source.ReadSubtree();
+        }
+
         public static IEnumerable< XmlReader > ReadEntries( object source, object checkData ) {
             using( XmlReader reader = CreateReader( ref source ) ) {
-                CheckerMethod checker = CreateChecker( ref checkData );
-                reader.MoveToContent();
-
-                while( reader.Read() )
-                    if( XmlNodeType.Element == reader.NodeType && checker( reader.Name ) )
-                        yield return reader.ReadSubtree();
+                foreach( XmlReader entry in ReadEntries( reader, checkData ) )
+                    yield return entry;
             }
         }
 
-        public delegate void ProcessMethod( XmlReader entry );
-
         public static void ProcessEntries( object source, object checkData, ProcessMethod method ) {
-            foreach( XmlReader reader in ReadEntries( source, checkData ) )
-                method( reader );
+            foreach( XmlReader entry in ReadEntries( source, checkData ) )
+                method( entry );
+        }
+
+        public static void ProcessEntries( object source, object checkData, ProcessMethodExtended method, object extraData ) {
+            foreach( XmlReader entry in ReadEntries( source, checkData ) )
+                method( entry, extraData );
         }
     }
 }
