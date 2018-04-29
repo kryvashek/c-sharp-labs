@@ -284,10 +284,7 @@ namespace lab07 {
         protected void effectSavePic( object sender, EventArgs e ) {
             saveFileBrief( ".png", delegate ( string filename ) {
                 invokeDangerous( String.Format( "запись {0}", filename ), delegate {
-                    int width, height;
-                    //_pixMap.GetSize( out width, out height );
-                    //Gdk.Pixbuf pixbufToSave = Gdk.Pixbuf.FromDrawable( _pixMap, _pixMap.Colormap, 0, 0, 0, 0, width, height );
-                    //pixbufToSave.Save( filename, "png" );
+                    _surface.WriteToPng( filename );
                 } );
             } );
         }
