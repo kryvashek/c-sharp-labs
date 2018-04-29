@@ -91,13 +91,13 @@ namespace lab07 {
             foreach( AbstractShape shape in _shapes ) {
                 _min.Minimize( shape.Min );
                 _max.Maximize( shape.Max );
-                log( String.Format( "фигура {0} расположена на позиции от {1} до {2}", shape, shape.Min.Literal, shape.Max.Literal ) );
+                log( "фигура {0} расположена на позиции от {1} до {2}", shape, shape.Min.Literal, shape.Max.Literal );
             }
 
             _min -= _lineWidthGap;
             _max += _lineWidthGap;
             _logicCanvasSize = _max - _min;
-            log( String.Format( "размер логического холста (с учётом толщины линий) - {0}", _logicCanvasSize.Literal ) );
+            log( "размер логического холста (с учётом толщины линий) - {0}", _logicCanvasSize.Literal );
             _logicCanvasSize *= _prescale;
             _surface = new Cairo.ImageSurface( Cairo.Format.Argb32, ( int )_logicCanvasSize.X, ( int )_logicCanvasSize.Y );
 
@@ -136,9 +136,9 @@ namespace lab07 {
         protected void invokeDangerous( string description, DangerousAction action ) {
             try {
                 action();
-                log( String.Format( "успех операции '{0}'", description ) );
+                log( "успех операции '{0}'", description );
             } catch( Exception exc ) {
-                log( String.Format( "ошибка операции '{0}': {1}", description, exc ) );
+                log( "ошибка операции '{0}': {1}", description, exc );
             }
         }
 
@@ -185,10 +185,9 @@ namespace lab07 {
             if( null == text )
                 return;
 
-            string operationTitle = String.Format( "парсинг {0}", filename );
             bool shapesListChanged = false;
 
-            invokeDangerous( operationTitle, delegate {
+            invokeDangerous( String.Format( "парсинг {0}", filename ), delegate {
                 object parsResult;
 
                 if( !_parsGetter.Parse( text, out parsResult ) ||
@@ -205,11 +204,12 @@ namespace lab07 {
             }
         }
 
-        protected void setStatus( string message ) {
-            statusBar.Push( _statusBarContext, message );
+        protected void setStatus( string format, params object[] args ) {
+            statusBar.Push( _statusBarContext, String.Format( format, args ) );
         }
 
-        protected void log( string message ) {
+        protected void log( string format, params object[] args ) {
+            string message = String.Format( format, args );
             setStatus( message );
             viewLogText.Buffer.InsertAtCursor( String.Format( "{0}: {1}{2}", DateTime.Now, message, Environment.NewLine ) );
         }
@@ -247,7 +247,7 @@ namespace lab07 {
             _currentAreaSize.X = width;
             _currentAreaSize.Y = height;
             drawShapes();
-            setStatus( String.Format( "Размер полотна в пикселях: {0} в ширину на {1} в высоту", width, height ) );
+            setStatus( "Размер полотна в пикселях: {0} в ширину на {1} в высоту", width, height );
         }
 
         protected void effectDelete( object sender, DeleteEventArgs a ) {
@@ -256,7 +256,7 @@ namespace lab07 {
         }
 
         protected void effectMotion( object o, MotionNotifyEventArgs args ) {
-            setStatus( String.Format( "Позиция указателя на полотне (в пикселях): {0}; {1}", args.Event.X, args.Event.Y ) );
+            setStatus( "Позиция указателя на полотне (в пикселях): {0}; {1}", args.Event.X, args.Event.Y );
         }
 
         protected void effectLoadScheme( object sender, EventArgs e ) {
