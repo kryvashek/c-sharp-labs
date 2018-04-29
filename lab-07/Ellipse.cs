@@ -42,12 +42,14 @@ namespace lab02 {
         public override Vertex Min {
             get {
                 return _position - new Vertex( _majorAxis, MinorAxis );
+                //todo change in order to process rotated ellipses (i.e. MajorAxis is collinear with OY)
             }
         }
 
         public override Vertex Max {
             get {
                 return _position + new Vertex( _majorAxis, MinorAxis );
+                //todo change in order to process rotated ellipses (i.e. MajorAxis is collinear with OY)
             }
         }
 
@@ -57,6 +59,19 @@ namespace lab02 {
                                 .Add( "f2", _focus )
                                 .Add( "ma", _majorAxis ).Finish();
             }
+        }
+
+        public override void Draw( Cairo.Context context ) {
+            Cairo.Matrix oldMatrix = context.Matrix;
+            double  a = MinorAxis / _majorAxis;
+
+            context.Translate( 0.0, _position.Y * ( 1 - a ) );
+            context.Scale( 1.0, a );
+            context.MoveTo( _position.X + _majorAxis, _position.Y );
+            context.Arc( _position.X, _position.Y, _majorAxis, 0.0, 2 * Math.PI );
+            context.ClosePath();
+            //todo change in order to process rotated ellipses (i.e. MajorAxis is collinear with OY)
+            context.Matrix = oldMatrix;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using Gtk;
 
 namespace lab02 {
     public interface AbstractShape : Pars.IParsable {
@@ -22,6 +23,9 @@ namespace lab02 {
 
         // человекочитаемое изложение параметров фигуры (центр масс, позиция, периметр и площадь)
         string Description { get; }
+
+        // рисование фигуры с заданными параметрами (context) на указанном холсте (canvas)
+        void Draw( Cairo.Context context );
 	}
 }
 

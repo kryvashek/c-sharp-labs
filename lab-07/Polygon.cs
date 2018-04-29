@@ -73,6 +73,15 @@ namespace lab02 {
             using( var parsAdder = new Pars.ParsAddder( "P" ) )
                 return parsAdder.Add( "v", _points ).Finish();
         }
+
+        public override void Draw( Cairo.Context context ) {
+            context.MoveTo( _points[ 0 ].X, _points[ 0 ].Y );
+
+            foreach( var point in _points )
+                context.LineTo( point.X, point.Y );
+            
+            context.ClosePath();
+        }
     }
 }
 

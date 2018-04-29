@@ -57,6 +57,11 @@ namespace lab02 {
 
         public abstract string ParsValue();
 
+        public virtual void Draw( Cairo.Context context ) {
+            context.MoveTo( _position.X, _position.Y );
+            context.ClosePath();
+        }
+
         public override string ToString() {
             return _kind;
         }
