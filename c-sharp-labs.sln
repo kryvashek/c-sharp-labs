@@ -1,0 +1,83 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lab-03", "lab-03\lab-03.csproj", "{484A49C8-FAFC-4C9B-B14C-65ADA68CD399}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lab-04", "lab-04\lab-04.csproj", "{0E68B470-F490-482F-931A-BA634EF829D0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lab-10", "lab-10\lab-10.csproj", "{885C273B-3D01-4BBA-ADBB-2C85F2D5D5EA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lab-08", "lab-08\lab-08.csproj", "{78E30D35-F85D-4202-A2BB-CAA13A1C5991}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lab-02", "lab-02\lab-02.csproj", "{A65DC8CA-0895-406F-B728-D24CB8CCEF85}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lab-01", "lab-01\lab-01.csproj", "{B3E3AA09-FFE3-4943-9905-FF1A6393A554}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lab-07", "lab-07\lab-07.csproj", "{3AB23579-41AD-4B8F-AE25-D16BBDB404E3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0E68B470-F490-482F-931A-BA634EF829D0}.Debug|x86.ActiveCfg = Debug|x86
+		{0E68B470-F490-482F-931A-BA634EF829D0}.Debug|x86.Build.0 = Debug|x86
+		{0E68B470-F490-482F-931A-BA634EF829D0}.Release|x86.ActiveCfg = Release|x86
+		{0E68B470-F490-482F-931A-BA634EF829D0}.Release|x86.Build.0 = Release|x86
+		{484A49C8-FAFC-4C9B-B14C-65ADA68CD399}.Debug|x86.ActiveCfg = Debug|x86
+		{484A49C8-FAFC-4C9B-B14C-65ADA68CD399}.Debug|x86.Build.0 = Debug|x86
+		{484A49C8-FAFC-4C9B-B14C-65ADA68CD399}.Release|x86.ActiveCfg = Release|x86
+		{484A49C8-FAFC-4C9B-B14C-65ADA68CD399}.Release|x86.Build.0 = Release|x86
+		{78E30D35-F85D-4202-A2BB-CAA13A1C5991}.Debug|x86.ActiveCfg = Debug|x86
+		{78E30D35-F85D-4202-A2BB-CAA13A1C5991}.Debug|x86.Build.0 = Debug|x86
+		{78E30D35-F85D-4202-A2BB-CAA13A1C5991}.Release|x86.ActiveCfg = Release|x86
+		{78E30D35-F85D-4202-A2BB-CAA13A1C5991}.Release|x86.Build.0 = Release|x86
+		{885C273B-3D01-4BBA-ADBB-2C85F2D5D5EA}.Debug|x86.ActiveCfg = Debug|x86
+		{885C273B-3D01-4BBA-ADBB-2C85F2D5D5EA}.Debug|x86.Build.0 = Debug|x86
+		{885C273B-3D01-4BBA-ADBB-2C85F2D5D5EA}.Release|x86.ActiveCfg = Release|x86
+		{885C273B-3D01-4BBA-ADBB-2C85F2D5D5EA}.Release|x86.Build.0 = Release|x86
+		{A65DC8CA-0895-406F-B728-D24CB8CCEF85}.Debug|x86.ActiveCfg = Debug|x86
+		{A65DC8CA-0895-406F-B728-D24CB8CCEF85}.Debug|x86.Build.0 = Debug|x86
+		{A65DC8CA-0895-406F-B728-D24CB8CCEF85}.Release|x86.ActiveCfg = Release|x86
+		{A65DC8CA-0895-406F-B728-D24CB8CCEF85}.Release|x86.Build.0 = Release|x86
+		{B3E3AA09-FFE3-4943-9905-FF1A6393A554}.Debug|x86.ActiveCfg = Debug|x86
+		{B3E3AA09-FFE3-4943-9905-FF1A6393A554}.Debug|x86.Build.0 = Debug|x86
+		{B3E3AA09-FFE3-4943-9905-FF1A6393A554}.Release|x86.ActiveCfg = Release|x86
+		{B3E3AA09-FFE3-4943-9905-FF1A6393A554}.Release|x86.Build.0 = Release|x86
+		{3AB23579-41AD-4B8F-AE25-D16BBDB404E3}.Debug|x86.ActiveCfg = Debug|x86
+		{3AB23579-41AD-4B8F-AE25-D16BBDB404E3}.Debug|x86.Build.0 = Debug|x86
+		{3AB23579-41AD-4B8F-AE25-D16BBDB404E3}.Release|x86.ActiveCfg = Release|x86
+		{3AB23579-41AD-4B8F-AE25-D16BBDB404E3}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		Policies = $0
+		$0.TextStylePolicy = $1
+		$1.TabsToSpaces = True
+		$1.NoTabsAfterNonTabs = True
+		$1.EolMarker = Unix
+		$1.scope = text/x-csharp
+		$0.CSharpFormattingPolicy = $2
+		$2.NewLinesForBracesInTypes = False
+		$2.NewLinesForBracesInMethods = False
+		$2.NewLinesForBracesInProperties = False
+		$2.NewLinesForBracesInAccessors = False
+		$2.NewLinesForBracesInAnonymousMethods = False
+		$2.NewLinesForBracesInControlBlocks = False
+		$2.NewLinesForBracesInAnonymousTypes = False
+		$2.NewLinesForBracesInObjectCollectionArrayInitializers = False
+		$2.NewLinesForBracesInLambdaExpressionBody = False
+		$2.NewLineForElse = False
+		$2.NewLineForCatch = False
+		$2.NewLineForFinally = False
+		$2.NewLineForClausesInQuery = False
+		$2.SpaceWithinMethodDeclarationParenthesis = True
+		$2.SpaceWithinMethodCallParentheses = True
+		$2.SpaceAfterControlFlowStatementKeyword = False
+		$2.SpaceWithinExpressionParentheses = True
+		$2.SpaceWithinCastParentheses = True
+		$2.SpaceWithinOtherParentheses = True
+		$2.SpaceWithinSquareBrackets = True
+		$2.scope = text/x-csharp
+	EndGlobalSection
+EndGlobal

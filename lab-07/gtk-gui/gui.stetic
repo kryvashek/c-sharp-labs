@@ -1,0 +1,141 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<stetic-interface>
+  <configuration>
+    <images-root-path>..</images-root-path>
+  </configuration>
+  <import>
+    <widget-library name="../bin/Debug/lab-07.exe" internal="true" />
+  </import>
+  <widget class="Gtk.Window" id="lab07.MainWindow" design-size="697 418">
+    <action-group name="Default">
+      <action id="openAction">
+        <property name="Type">Action</property>
+        <property name="Accelerator">&lt;Primary&gt;&lt;Mod2&gt;o</property>
+        <property name="Label" translatable="yes">Открыть</property>
+        <property name="ShortLabel" translatable="yes">Открыть</property>
+        <property name="StockId">gtk-open</property>
+        <signal name="Activated" handler="effectLoadScheme" />
+      </action>
+      <action id="saveAsAction">
+        <property name="Type">Action</property>
+        <property name="Accelerator">&lt;Primary&gt;&lt;Mod2&gt;s</property>
+        <property name="Label" translatable="yes">Сохранить схему</property>
+        <property name="ShortLabel" translatable="yes">Сохранить схему</property>
+        <property name="StockId">gtk-save-as</property>
+        <signal name="Activated" handler="effectSaveScheme" />
+      </action>
+      <action id="convertAction">
+        <property name="Type">Action</property>
+        <property name="Accelerator">&lt;Primary&gt;&lt;Alt&gt;&lt;Mod2&gt;s</property>
+        <property name="Label" translatable="yes">Сохранить картинку</property>
+        <property name="ShortLabel" translatable="yes">Сохранить картинку</property>
+        <property name="StockId">gtk-convert</property>
+        <signal name="Activated" handler="effectSavePic" />
+      </action>
+      <action id="indexAction">
+        <property name="Type">Action</property>
+        <property name="Accelerator">&lt;Alt&gt;&lt;Mod2&gt;s</property>
+        <property name="Label" translatable="yes">Сохранить журнал</property>
+        <property name="ShortLabel" translatable="yes">Сохранить журнал</property>
+        <property name="StockId">gtk-index</property>
+        <signal name="Activated" handler="effectSaveLog" />
+      </action>
+      <action id="quitAction">
+        <property name="Type">Action</property>
+        <property name="Accelerator">&lt;Primary&gt;&lt;Mod2&gt;q</property>
+        <property name="Label" translatable="yes">Выйти</property>
+        <property name="ShortLabel" translatable="yes">Выйти</property>
+        <property name="StockId">gtk-quit</property>
+        <signal name="Activated" handler="effectQuit" />
+      </action>
+    </action-group>
+    <property name="MemberName" />
+    <property name="Title" translatable="yes">MainWindow</property>
+    <property name="WindowPosition">CenterOnParent</property>
+    <signal name="DeleteEvent" handler="effectDelete" />
+    <child>
+      <widget class="Gtk.VPaned" id="vpaned">
+        <property name="MemberName" />
+        <property name="CanFocus">True</property>
+        <property name="Position">320</property>
+        <child>
+          <widget class="Gtk.VBox" id="vboxUp">
+            <property name="MemberName" />
+            <property name="Spacing">6</property>
+            <child>
+              <widget class="Gtk.Toolbar" id="toolBar">
+                <property name="MemberName" />
+                <property name="ShowArrow">False</property>
+                <property name="ButtonStyle">Both</property>
+                <property name="IconSize">Menu</property>
+                <node name="toolBar" type="Toolbar">
+                  <node type="Toolitem" action="openAction" />
+                  <node type="Toolitem" action="saveAsAction" />
+                  <node type="Toolitem" action="convertAction" />
+                  <node type="Toolitem" action="indexAction" />
+                  <node type="Toolitem" action="quitAction" />
+                </node>
+              </widget>
+              <packing>
+                <property name="Position">0</property>
+                <property name="AutoSize">True</property>
+                <property name="Expand">False</property>
+                <property name="Fill">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.DrawingArea" id="drawingArea">
+                <property name="MemberName" />
+                <signal name="MotionNotifyEvent" handler="effectMotion" />
+                <signal name="ExposeEvent" handler="effectExpose" />
+              </widget>
+              <packing>
+                <property name="Position">1</property>
+                <property name="AutoSize">True</property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="Resize">False</property>
+          </packing>
+        </child>
+        <child>
+          <widget class="Gtk.VBox" id="vboxDown">
+            <property name="MemberName" />
+            <property name="Spacing">6</property>
+            <child>
+              <widget class="Gtk.ScrolledWindow" id="GtkScrolledWindow">
+                <property name="MemberName" />
+                <property name="ShadowType">In</property>
+                <child>
+                  <widget class="Gtk.TextView" id="viewLogText">
+                    <property name="MemberName" />
+                    <property name="CanFocus">True</property>
+                    <property name="ShowScrollbars">True</property>
+                    <property name="Text" translatable="yes" />
+                  </widget>
+                </child>
+              </widget>
+              <packing>
+                <property name="Position">0</property>
+                <property name="AutoSize">True</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.Statusbar" id="statusBar">
+                <property name="MemberName" />
+                <property name="Spacing">6</property>
+              </widget>
+              <packing>
+                <property name="Position">1</property>
+                <property name="AutoSize">True</property>
+                <property name="Expand">False</property>
+                <property name="Fill">False</property>
+              </packing>
+            </child>
+          </widget>
+        </child>
+      </widget>
+    </child>
+  </widget>
+</stetic-interface>
